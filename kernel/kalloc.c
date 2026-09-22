@@ -95,8 +95,8 @@ freepages(void)
 
   r = kmem.freelist;
   while (r) {
-    n++;
-    r = r->next;  // TODO ①  count this page, then move to the next one
+    n++;	//1회 동작을 할 경우 n을 1 증가시킨다.
+    r = r->next;  //페이지 수를 셀 경우 r을 다음 페이지로 이동하고 동작을 반복한다.
   }
 
   release(&kmem.lock);

@@ -714,8 +714,8 @@ nproc(void)
   for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p->lock);
 
-    if (p->state != UNUSED)
-      n++;
+    if (p->state != UNUSED)	//p의 상태가 UNUSED가 아니라면
+      n++;	//n을 1 증가시킨다.
 
     release(&p->lock);
   }

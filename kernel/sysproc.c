@@ -117,7 +117,7 @@ sys_uptime(void)
 uint64
 sys_freepages(void)
 {
-  return freepages(); // TODO ②  call the function you wrote in kalloc.c
+  return freepages(); //freepages의 반환값을 sys_freepages의 반환값으로 한다.
 }
 
 
@@ -128,13 +128,13 @@ sys_sysinfo(void)
   uint64 addr;
   struct proc *p = myproc();
 
-  argaddr(0, &addr);
+  argaddr(0, &addr);        // 첫 번째 인자를 주소로 받는다
 
   info.freepages = freepages();
   info.nproc     = nproc();
 
-  if (copyout(p->pagetable, p->sz, addr, (char *)&info, sizeof(info)) < 0)
-    return -1;
+  if (copyout(p->pagetable, p->sz, addr, (char *)&info, sizeof(info)) < 0)	//정보를 사용자 주소로 복사하기 실패한 경우
+    return -1;	//-1을 반환한다.
 
   return 0;
 }
