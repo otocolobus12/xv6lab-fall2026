@@ -129,8 +129,8 @@ sys_va2pa(void)
   //          printk("va %p : L2=%d L1=%d L0=%d off=0x%x\n", ...);
   //          - 칸 번호 셋 : PX(2, va) · PX(1, va) · PX(0, va)
   //          - 오프셋     : va 의 아래 12비트  (va & 0xFFF)
-  printk("va %ld : L2=%ld L1=%ld L0=%ld off=0x%lx\n",
-         va, PX(2, va), PX(1, va), PX(0, va), va & 0xFFF);
+  printk("va %ld : L2=%ld L1=%ld L0=%ld off=0x%lx\n",	//출력 형식을 지정
+         va, PX(2, va), PX(1, va), PX(0, va), va & 0xFFF);	//출력될 결과들을 순서에 맞춰서 작성
 
 
   pte = walk(p->pagetable, va, 0);    // alloc = 0 : 찾기만 하고 만들지 않는다
@@ -142,6 +142,6 @@ sys_va2pa(void)
   // TODO ②  va 의 물리 주소를 돌려준다. 두 조각을 더하면 된다.
   //          - 페이지 시작 주소 : PTE2PA(*pte)
   //          - 페이지 안 오프셋 : va 의 아래 12비트
-  return PTE2PA(*pte) + (va & 0xFFF);
+  return PTE2PA(*pte) + (va & 0xFFF);	//물리 주소 반환
 }
 

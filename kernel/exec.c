@@ -137,8 +137,8 @@ kexec(char *path, char **argv)
   p->trapframe->sp = sp;         // initial stack pointer
   proc_freepagetable(oldpagetable, oldsz);
 
-  if (p->pid == 1)               // 추가
-    vmprint(p->pagetable);       // 추가
+  if (p->pid == 1)               // PID가 1일 경우
+    vmprint(p->pagetable);       // 페이지테이블 출력
 
   return argc; // this ends up in a0, the first argument to main(argc, argv)
 
