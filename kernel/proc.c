@@ -124,6 +124,7 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->priority = 10;  //기본값
 
   // Allocate a trapframe page.
   if ((p->trapframe = (struct trapframe *)kalloc()) == 0) {
@@ -425,6 +426,8 @@ kwait(uint64 addr)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
+#define AGING 2
+
 void
 scheduler(void)
 {
@@ -441,10 +444,21 @@ scheduler(void)
     intr_on();
     intr_off();
 
+    //(1)가장 높은 우선순위 값(가장 작은 수)을 구한다
+    int minprio = -1;
+    for(p=proc; p<&proc[NPROC]; p++) {
+     acquire(&p->lock);
+     if (p->state == RUNNABLE &&
+	(minprio == -1 || p->priority<minprio))
+       minprio = p->priority;
+      release(&p->lock);
+     }
+
+    //원래 루프 그대로 + 조건 하나
     int found = 0;
     for (p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if (p->state == RUNNABLE) {
+      if (p->state == RUNNABLE && p->priority == minprio) {
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
@@ -459,7 +473,15 @@ scheduler(void)
         // It should have changed its p->state before coming back.
         c->proc = 0;
         found = 1;
-      }
+//	p->priority = p->base_priority;  //실행했으면 원래 값으로
+//	p->waited = 0;
+//       } else if(p->state == RUNNABLE) {  //밀려난 칸
+//	 if(++p->waited >= AGING) {
+//	  if(p->priority > minprio)
+//	   p->priority--;  //한단계 올림
+//	  p->waited = 0;
+	 }
+//      }
       release(&p->lock);
     }
     if (found == 0) {

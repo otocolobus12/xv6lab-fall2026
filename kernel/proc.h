@@ -81,6 +81,9 @@ enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 // Per-process state
 struct proc {
   struct spinlock lock;
+  int priority;  //작을수록 먼저
+  int base_priority;  //set_priority로 정한 값
+  int waited;  //밀려난 횟수
 
   // p->lock must be held when using these:
   enum procstate state; // Process state
