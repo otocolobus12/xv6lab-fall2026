@@ -110,3 +110,18 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+//추가
+uint64
+sys_set_priority(void)
+{
+ int n;
+ argint(0, &n);
+ if(n<0||n>20)
+  return -1;
+ struct proc *p = myproc();
+ acquire(&p->lock);
+ p->priority = n;
+ release(&p->lock);
+ return 0 ;
+}
