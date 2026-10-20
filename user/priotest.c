@@ -8,23 +8,23 @@
 int
 main(int argc, char *argv[])
 {
- int prio[N] = {1, 5, 10};
+ int prio[N] = {1, 10, 10};  //우선순위 기본값
  for (int i = 0; i < N && i + 1 < argc; i++)
-  prio[i] = atoi(argv[i + 1]);
+  prio[i] = atoi(argv[i + 1]);  //입력 값으로 우선순위 지정
 
- int start = uptime();
+ int start = uptime();  //시작 시간
  for (int i = 0; i < N; i++) {
   if (fork() == 0) {                  // 자식A, B, C
-   set_priority(prio[i]);
-   volatile unsigned long x = 0;
+   set_priority(prio[i]);  //우선순위 설정
+   volatile unsigned long x = 0;  //계산 결과 저장
    for (unsigned long j = 0; j < 1500000000UL; j++)
     x += j;                         // 계산만한다
    printf("%c (pid %d, prio %d) done at %d ticks\n",
-	'A' + i, getpid(), prio[i], uptime() - start);
-   exit(0);
+	'A' + i, getpid(), prio[i], uptime() - start);  //출력 형식 지정
+   exit(0);  //자식 종료
   }
  }
  for (int i = 0; i < N; i++)
-  wait(0);
- exit(0);
+  wait(0);  //자식 종료 대기
+ exit(0);  //부모 종료
 }

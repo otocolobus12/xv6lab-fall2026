@@ -445,44 +445,44 @@ scheduler(void)
     intr_off();
 
     //(1)가장 높은 우선순위 값(가장 작은 수)을 구한다
-    int minprio = -1;
-    for(p=proc; p<&proc[NPROC]; p++) {
-     acquire(&p->lock);
+    int minprio = -1;  //가장 높은 우선순위 변수
+    for(p=proc; p<&proc[NPROC]; p++) {  //프로세스 순회
+     acquire(&p->lock);  //잠금
      if (p->state == RUNNABLE &&
-	(minprio == -1 || p->priority<minprio))
-       minprio = p->priority;
-      release(&p->lock);
+	(minprio == -1 || p->priority<minprio))  //실행 가능하고 우선 순위가 높은 경우
+       minprio = p->priority;  //우선순위 변경
+      release(&p->lock);  //잠금 해제
      }
 
-    //원래 루프 그대로 + 조건 하나
+    //원래 루프 그대로 + 조건 하나 + 에이징
     int found = 0;
-    for (p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if (p->state == RUNNABLE && p->priority == minprio) {
+    for (p = proc; p < &proc[NPROC]; p++) {  //프로세스 순회
+      acquire(&p->lock);  //프로세스 잠금
+      if (p->state == RUNNABLE && p->priority == minprio) {  //실행 가능하고 우선 순위 높은 프로세스 선택
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
+        p->state = RUNNING;  //실행중
+        c->proc = p;  //CPU 프로세스로 지정
         swtch(&c->context, &p->context);
 
         // Don't re-enable interrupts on release.
-        mycpu()->intena = 0;
+        mycpu()->intena = 0;  //잠금 해제 시 상태 복원 방지
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
-//	p->priority = p->base_priority;  //실행했으면 원래 값으로
-//	p->waited = 0;
-//       } else if(p->state == RUNNABLE) {  //밀려난 칸
-//	 if(++p->waited >= AGING) {
-//	  if(p->priority > minprio)
-//	   p->priority--;  //한단계 올림
-//	  p->waited = 0;
-	 }
-//      }
-      release(&p->lock);
+        c->proc = 0;  //CPU 실행 프로세스 정보 초기화
+        found = 1;  //실행 완료
+	p->priority = p->priority;  //실행했으면 원래 값으로
+	p->waited = 0;  //시간 초기화
+       }else if(p->state == RUNNABLE) {  //밀려난 칸
+	if(++p->waited >= AGING) {  //대기 횟수 기준 도달
+	 if(p->priority > 0)  우선 순위가 0보다 클 경우
+	  p->priority--;  //한단계 올림
+	 p->waited = 0;  //대기 초기화
+	}
+      }
+      release(&p->lock);  //잠금 해제
     }
     if (found == 0) {
       // nothing to run; stop running on this core until an interrupt.

@@ -117,11 +117,11 @@ sys_set_priority(void)
 {
  int n;
  argint(0, &n);
- if(n<0||n>20)
+ if(n<0||n>20)  //우선순위의 범위가 0-20 사이가 아니라면 오류
   return -1;
  struct proc *p = myproc();
- acquire(&p->lock);
- p->priority = n;
- release(&p->lock);
+ acquire(&p->lock);  //프로세스 변경 전 잠금
+ p->priority = n;  //프로세스 우선순위 변경
+ release(&p->lock);  //잠금 해제
  return 0 ;
 }
